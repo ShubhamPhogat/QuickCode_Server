@@ -1,11 +1,7 @@
 const { createClient } = require("redis");
-const { exec, execSync } = require("child_process");
-const fs = require("fs");
-const path = require("path");
-const uuid = require("uuid");
-const { json } = require("stream/consumers");
 const { CppTestRunner } = require("./cpp_runner");
 const { PythonTestRunner } = require("./python_runner");
+const { JsTestRunner } = require("./js_runner");
 
 const main = async () => {
   const cppRunner = new CppTestRunner();
@@ -33,12 +29,17 @@ const main = async () => {
           break;
         case "Python":
           const pyResult = await pyRunner.execute(job);
-
-          await redisClient.lPush(
-            `results:${job.job_id}`,
-            JSON.stringify(pyResult)
-          );
+          console.log("pyResult", pyResult);
+          await redisClient.publish(`${job.job_id}`, JSON.stringify(pyResult));
           console.log(`Completed job ${job.job_id}`);
+
+        // case "Javascript":
+        //   const jsResult = await JsTestRunner.execute(job);
+        //   await redisClient.lPush(
+        //     `results:${job.job_id}`,
+        //     JSON.stringify(jsResult)
+        //   );
+        //   console.log(`Completed job ${job.job_id}`);
 
         default:
           break;

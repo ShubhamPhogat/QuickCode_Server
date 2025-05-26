@@ -20,7 +20,10 @@ const main = async function () {
         const rm = await RedisManager.getInstance();
         const res = await rm.sendToWorker(job);
         console.log("this is ", res);
-        if (data.all) {
+
+        if (data.exampleTestCases) {
+          ws.send(JSON.stringify(res));
+        } else if (data.all) {
           ws.send(
             JSON.stringify({
               data: res.generatedResults,
