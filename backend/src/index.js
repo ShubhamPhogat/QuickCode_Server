@@ -22,7 +22,7 @@ const main = async function () {
         console.log("this is ", res);
 
         if (data.exampleTestCases) {
-          ws.send(JSON.stringify(res));
+          ws.send(JSON.stringify(res.results));
         } else if (data.all) {
           ws.send(
             JSON.stringify({
@@ -31,7 +31,9 @@ const main = async function () {
           );
         } else if (res.success) {
           if (res.allPassed) {
-            ws.send(JSON.stringify({ status: 1, allPassed: true }));
+            ws.send(
+              JSON.stringify({ status: 1, allPassed: true, success: true })
+            );
           } else {
             let failedTestCase = null;
             for (tc of res.results) {
