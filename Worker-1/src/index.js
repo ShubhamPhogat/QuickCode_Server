@@ -2,6 +2,7 @@ const { createClient } = require("redis");
 const { CppTestRunner } = require("./cpp_runner");
 const { PythonTestRunner } = require("./python_runner");
 const { JsTestRunner } = require("./js_runner");
+const { JavaTestRunner } = require("./java_runner");
 
 const main = async () => {
   const cppRunner = new CppTestRunner();
@@ -32,14 +33,25 @@ const main = async () => {
           console.log("pyResult", pyResult);
           await redisClient.publish(`${job.job_id}`, JSON.stringify(pyResult));
           console.log(`Completed job ${job.job_id}`);
+          break;
 
-        // case "Javascript":
-        //   const jsResult = await JsTestRunner.execute(job);
-        //   await redisClient.lPush(
-        //     `results:${job.job_id}`,
-        //     JSON.stringify(jsResult)
-        //   );
-        //   console.log(`Completed job ${job.job_id}`);
+        case "Java":
+          const javaResult = await JavaTestRunner.execute(job);
+          console.log("java results", javaResult);
+          await redisClient.publish(
+            `${job.job_id}`,
+            JSON.stringify(javaResult)
+          );
+          break;
+
+        case "Javascript":
+          const jsResult = await JsTestRunner.execute(job);
+          await redisClient.lPush(
+            `results:${job.job_id}`,
+            JSON.stringify(jsResult)
+          );
+          console.log(`Completed job ${job.job_id}`);
+          break;
 
         default:
           break;
